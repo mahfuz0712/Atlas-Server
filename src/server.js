@@ -6,6 +6,7 @@ export class Server {
   constructor(port) {
     this.port = port;
     this.server = express();
+    this.Router = express.Router();
 
     // Default middleware
     this.server.use(express.json());
@@ -43,5 +44,8 @@ export class Server {
 
   Route(route, router) {
     this.server.use(route, router);
+  }
+  Router() {
+    return this.Router
   }
 }
