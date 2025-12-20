@@ -7,11 +7,13 @@ export class Server {
     this.port = port;
     this.server = express();
 
-    // Default middleware
-    this.server.use(express.json());
-    this.server.use(express.urlencoded({ extended: true }));
+    // 🔥 IMPORTANT: Increase body limits
+    this.server.use(express.json({ limit: "1gb" }));
+    this.server.use(express.urlencoded({ extended: true, limit: "1gb" }));
+
     this.server.use(express.static("public"));
     this.server.use(cookieParser());
+
     this.server.use((req, res, next) => {
       res.setHeader("Content-Security-Policy", "default-src 'self'");
       res.setHeader("X-Content-Type-Options", "nosniff");
