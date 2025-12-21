@@ -7,7 +7,7 @@ export class Server {
     this.port = port;
     this.server = express();
 
-    // 🔥 IMPORTANT: Increase body limits
+
     this.server.use(express.json({ limit: "1gb" }));
     this.server.use(express.urlencoded({ extended: true, limit: "1gb" }));
 
