@@ -1,10 +1,4 @@
 declare module 'atlas-server' {
-    export class Database {
-        private config: DatabaseConfig;
-        constructor(config: DatabaseConfig);
-        connect(): Promise<boolean>;
-    }
-
     export interface DatabaseConfig {
         subdomain: string;
         username: string;
@@ -13,13 +7,19 @@ declare module 'atlas-server' {
         dbName: string;
     }
 
+    export class Database {
+        private config: DatabaseConfig;
+        constructor(config: DatabaseConfig);
+        connect(): Promise<boolean>;
+    }
+
     export class Server {
         private port: number;
         private server: any; // express.Application
         constructor(port: number);
         connectFrontend(frontendUrl: string): void;
-        start(): Promise<void>;
-        Use(route: string, router: any): void; // router: express.Router
+        Start(): Promise<void>;
+        Route(route: string, router: any): void; // router: express.Router
     }
 
     export class Github {

@@ -1,50 +1,88 @@
 # Atlas Server
 
-Atlas Server  is a small collection of backend helper classes for Node.js (MERN-style stacks). It provides simple utilities to connect to MongoDB Atlas, create an Express-based server with common middleware, and fetch GitHub repository metadata.
+Atlas Server  is a small collection of backend helper classes for Node.js (MERN Stack style).
 
-This README documents the public API, installation, quickstart examples, and notes about running the included examples.
+
 
 ## Features
 
 - Database: Connect to MongoDB Atlas with a primary +srv URL and a fallback standard URL.
-- Server: Lightweight wrapper for starting an Express server with safe defaults and helper methods for routing and CORS.
+- Server: Lightweight wrapper for starting an Express server with safe defaults and helper methods for routing.
 - Github: Helper to fetch repository metadata, readme URL, contributors, releases and assets using the GitHub REST API.
 
 ## Requirements
 
-- Node.js (v16+ recommended)
+- Node.js (v22+ recommended)
 - npm
 
-The package declares the following runtime dependencies (see `package.json`): `axios`, `cookie-parser`, `cors`, `express`, `mongoose`.
 
 ## Install
-
-
 ```bash
 # from project root
 npm install atlas-server
 ```
 
-To run the example/test file used during development:
+## Project Directory Structure
 
-```bash
-npm run test
+```
+backend/
+├── src/
+│   ├── controllers/
+│   │   └── testController.js
+│   ├── db/
+│   │   └── dbConfig.js
+│   ├── routes/
+│   │   └── testRouter.js
+│   ├── server/
+│   │   └── server.js
+│   └── index.js
+├── .gitignore
+├── LICENSE
+├── package.json
+└── README.md
+
 ```
 
-> Note: `npm run test` starts `nodemon src/test.js` as shipped. `src/test.js` contains example usage and may attempt to connect to an external MongoDB Atlas cluster — do not run it with embedded credentials. Replace credentials with your own or run examples locally behind a firewall.
 
-## Quickstart
+## Usage
 
-Below are example usages mirroring the classes in `src/index.js`.
 
-### Database
-
-The `Database` class provides a `connect()` method that first tries the MongoDB +srv URL then a fallback standard connection string.
-
-Example:
-
+in your main index file:
 ```javascript
-import { Database } from "./src/index.js";
+// src/index.js
+import "dotenv/config";
+import database from "./db/dbConfig.js";
+import server from "./server/server.js";
+
+const isDBConnected = await database.connect();
+if (isDBConnected) {
+	console.log("Connected"); 
+	await server.Start();
+} else {
+	console.error("Connection failed");
+}
+```
+Notes:
+- The `connect()` method returns a boolean (true = connected, false = not connected).
+
+in your server file:
+```javascript
+// src/server/server.js
+import { Server } from "atlas-server";
+
+const server = new Server(5000);
+server.connectFrontend("your-frontend-url");
+
+// Route definitions here
+import testRouter from "./routes/testRouter.js";
+server.Route("/test", testRouter);
+
+export default server;
+```
+in your database config file:
+```javascript
+// src/db/dbConfig.js
+import { Database } from "atlas-server";
 
 const database = new Database({
 	subdomain: "yourAtlasSubdomain",
@@ -54,39 +92,38 @@ const database = new Database({
 	dbName: "myDatabase",
 });
 
-const ok = await database.connect();
-if (ok) console.log("Connected"); else console.error("Connection failed");
+export default database;
 ```
-
 Notes:
-- Provide your own Atlas credentials; do not commit secrets to source control.
-- The `connect()` method returns a boolean (true = connected, false = not connected).
+- Provide your own Atlas credentials, do not commit secrets to source control.
 
-### Server
 
-The `Server` class wraps an Express app and wires a set of sensible middleware.
-
-API sketch:
-- constructor(port) — creates a server bound to `port`.
-- connectFrontend(frontendUrl) — configures CORS to allow `frontendUrl` with credentials.
-- start() — starts listening (async function that resolves once listening handler runs).
-- Router() — convenience wrapper returning `express.Router()`.
-- Use(route, router) — mount a router at `route`.
-
-Example:
-
+in your route file:
 ```javascript
-import { Server } from "./src/index.js";
-
-const server = new Server(5000);
-server.connectFrontend("http://localhost:5173");
-
-const router = server.Router();
-router.get("/ping", (req, res) => res.json({ ok: true }));
-
-server.Use("/api", router);
-await server.start();
+// src/routes/testRouter.js
+import { Router } from "atlas-server";
+import { testController } from "../controllers/testController.js";
+const testRouter = new Router();
+testRouter.post("/hi", testController);
+export default testRouter;
 ```
+
+
+
+in your controller file:
+```javascript
+// src/controllers/testController.js
+import { AsyncHandler } from "atlas-server";
+export const testController = AsyncHandler(async (req, res) => {
+  const body = req.body;
+  res.json({ success: true, message: body });
+});
+
+```
+
+
+
+
 
 ### Github helper
 
@@ -101,7 +138,7 @@ Main methods:
 Example:
 
 ```javascript
-import { Github } from "./src/index.js";
+import { Github } from "atlas-server";
 
 const gh = new Github("yourUsername", "yourToken");
 const info = await gh.repoInfo("your-repo-name");

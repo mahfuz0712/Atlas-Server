@@ -12,11 +12,9 @@ import AsyncHandler from "express-async-handler";
 
 export {
   Database,
+  Model,
   Server,
   Github,
-  Router,
-  AsyncHandler,
-  Model,
   Encrypt,
   Compare,
   Cache,
@@ -24,5 +22,7 @@ export {
   Matrix,
   NumericMode,
   Vector, 
-  Graph
+  Graph,
+  Router,
+  AsyncHandler
 };

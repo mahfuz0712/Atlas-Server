@@ -1,7 +1,5 @@
 import "dotenv/config";
 import {
-  Database,
-  Server,
   Github,
   Stack,
   Matrix,
@@ -9,31 +7,6 @@ import {
   NumericMode, Vector, Graph
 } from "../index.js";
 
-const database = new Database({
-  subdomain: process.env.MONGO_SUBDOMAIN,
-  username: process.env.MONGO_USERNAME,
-  password: process.env.MONGO_PASSWORD,
-  cluster: process.env.MONGO_CLUSTER,
-  dbName: process.env.MONGO_DBNAME,
-});
-
-const server = new Server(5000);
-
-const isDBConnected = await database.connect();
-
-if (isDBConnected) {
-  console.log("database connected");
-  server.connectFrontend("http://localhost:5173");
-  const Router = server.Router
-  Router.post("/hi", async (req, res) => {
-    const body = req.body;
-    res.json({success: true, message: body})
-  })
-  server.Route("/", Router)
-  await server.start();
-} else {
-  console.error("Database connection failed");
-}
 
 
 

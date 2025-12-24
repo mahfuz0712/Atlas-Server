@@ -6,14 +6,10 @@ export class Server {
   constructor(port) {
     this.port = port;
     this.server = express();
-
-
-    this.server.use(express.json({ limit: "1gb" }));
-    this.server.use(express.urlencoded({ extended: true, limit: "1gb" }));
-
+    this.server.use(express.json({ limit: "10gb" }));
+    this.server.use(express.urlencoded({ extended: true, limit: "10gb" }));
     this.server.use(express.static("public"));
     this.server.use(cookieParser());
-
     this.server.use((req, res, next) => {
       res.setHeader("Content-Security-Policy", "default-src 'self'");
       res.setHeader("X-Content-Type-Options", "nosniff");
@@ -26,18 +22,16 @@ export class Server {
       console.error("Please provide a frontend url");
       return;
     }
-
     this.server.use(
       cors({
         origin: frontendUrl,
         credentials: true,
       })
     );
-
     console.log(`Frontend allowed: ${frontendUrl}`);
   }
 
-  async start() {
+  async Start() {
     this.server.listen(this.port, () => {
       console.log(`Server running on ${this.port}`);
     });
