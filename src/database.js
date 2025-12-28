@@ -60,6 +60,7 @@ export function Model(modelName, schemaDefinition, options = {}) {
   return {
     create: async (data) => model.create(data),
     findAll: async (filters = {}) => model.find(filters),
+    findOne: async (filters = {}) => model.findOne(filters),
     findById: async (id) => model.findById(id),
     updateById: async (id, data) => model.findByIdAndUpdate(id, data, { new: true }),
     deleteById: async (id) => model.findByIdAndDelete(id),
